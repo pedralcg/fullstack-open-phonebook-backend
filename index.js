@@ -38,6 +38,25 @@
     });
 
 
+    //! NUEVA RUTA: Obtener una entrada individual por ID
+    app.get('/api/persons/:id', (request, response) => {
+    // Accede al parámetro 'id' de la URL y conviértelo a número
+    const id = Number(request.params.id);
+
+    // Busca la persona con el id correspondiente en el array 'persons'
+    const person = persons.find(p => p.id === id);
+
+    // Comprueba si se encontró la persona
+    if (person) {
+        response.json(person); // Si se encuentra, envía los datos como JSON
+    } else {
+        // Si no se encuentra, envía un código de estado 404 (Not Found)
+        // y termina la respuesta sin cuerpo (end()).
+        response.status(404).end();
+    }
+    });
+
+
     //! NUEVA RUTA: /info
 app.get('/info', (request, response) => {
   const numberOfEntries = persons.length; // Obtiene el número de entradas
