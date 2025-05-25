@@ -37,6 +37,21 @@
       response.json(persons); // Envía los datos de 'persons' como JSON
     });
 
+
+    //! NUEVA RUTA: /info
+app.get('/info', (request, response) => {
+  const numberOfEntries = persons.length; // Obtiene el número de entradas
+  const requestTime = new Date(); // Obtiene la hora actual de la solicitud
+
+  // Construye la respuesta HTML
+  const infoHtml = `
+    <p>Phonebook has info for ${numberOfEntries} people</p>
+    <p>${requestTime}</p>
+  `;
+  response.send(infoHtml); // Envía la respuesta HTML
+});
+
+
     // Define el puerto en el que la aplicación escuchará las peticiones
     const PORT = 3001;
     app.listen(PORT, () => {
