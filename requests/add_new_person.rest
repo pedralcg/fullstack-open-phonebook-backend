@@ -1,0 +1,9 @@
+
+### Añadir una nueva persona
+POST http://localhost:3001/api/persons
+Content-Type: application/json
+
+{
+    "name": "Pedro Alcoba",
+    "number": "666-999-666"
+}

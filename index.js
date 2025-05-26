@@ -3,6 +3,9 @@ const express = require('express');
 // Crea una instancia de la aplicación express
 const app = express();
 
+    //! Configuración para leer datos JSON en el cuerpo de las solicitudes
+    app.use(express.json());
+
 // Datos codificados de la agenda telefónica
 let persons = [
     {
@@ -68,6 +71,33 @@ app.delete('/api/persons/:id', (request, response) => {
     // El código 204 indica que la solicitud fue exitosa pero no hay contenido que devolver.
     response.status(204).end();
     });
+
+
+//! NUEVA RUTA: Añadir una nueva entrada (POST)
+app.post('/api/persons', (request, response) => {
+  // Accede al cuerpo de la solicitud (ya parseado por express.json())
+  const body = request.body;
+
+  // Genera un nuevo ID aleatorio
+  const generateId = () => {
+    const min = 10;
+    const max = 1000000;
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  };
+
+  // Crea el nuevo objeto persona
+  const person = {
+    id: generateId(), // Asigna el ID generado
+    name: body.name,
+    number: body.number
+  };
+
+  // Añade la nueva persona al array 'persons'
+  persons = persons.concat(person);
+
+  // Responde con la nueva persona creada y el código de estado 201 (Created)
+  response.status(201).json(person);
+});
 
 
 //! NUEVA RUTA: /info
