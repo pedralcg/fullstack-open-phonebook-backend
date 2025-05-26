@@ -1,0 +1,6 @@
+
+### Eliminar una persona
+DELETE http://localhost:3001/api/persons/2
+
+### Intentar eliminar una persona que no existe
+DELETE http://localhost:3001/api/persons/999
