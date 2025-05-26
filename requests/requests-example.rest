@@ -1,0 +1,58 @@
+###! Añadir una nueva persona
+POST http://localhost:3001/api/persons
+Content-Type: application/json
+
+{
+    "name": "Pedro Alcoba",
+    "number": "66-999-696969"
+}
+
+### Expected Response:
+# HTTP/1.1 201 Created
+
+
+
+###! Error Nombre faltante
+POST http://localhost:3001/api/persons
+Content-Type: application/json
+
+{
+    "number": "111-222333"
+}
+
+### Expected Response:
+# HTTP/1.1 400 Bad Request
+
+
+
+###! Error Número de teléfono faltante
+POST http://localhost:3001/api/persons
+Content-Type: application/json
+
+{
+    "name": "Julia"
+}
+
+### Expected Response:
+# HTTP/1.1 400 Bad Request
+
+
+
+###! Error Nombre ya existente
+POST http://localhost:3001/api/persons
+Content-Type: application/json
+
+{
+    "name": "Arto Hellas",
+    "number": "000-000000"
+}
+
+### Expected Response:
+# HTTP/1.1 400 Bad Request
+
+
+###! Obtener todas las personas (para verificar la adición)
+GET http://localhost:3001/api/persons
+
+### Expected Response:
+# HTTP/1.1 200 OK

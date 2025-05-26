@@ -78,6 +78,29 @@ app.post('/api/persons', (request, response) => {
   // Accede al cuerpo de la solicitud (ya parseado por express.json())
   const body = request.body;
 
+  //* Validación 1: Comprobar si falta el nombre o el número
+  if (!body.name) {
+    return response.status(400).json({
+      error: 'Name missing'
+    });
+  }
+  if (!body.number) {
+    return response.status(400).json({
+      error: 'Number missing'
+    });
+  }
+
+  //* Validación 2: Comprobar si el nombre ya existe (insensible a mayúsculas/minúsculas)
+  const nameExists = persons.some(person =>
+    person.name.toLowerCase() === body.name.toLowerCase()
+  );
+
+  if (nameExists) {
+    return response.status(400).json({
+      error: 'Name must be unique'
+    });
+  }
+
   // Genera un nuevo ID aleatorio
   const generateId = () => {
     const min = 10;
