@@ -1,12 +1,17 @@
-// Importa el módulo express
-const express = require('express');
-// Importa el módulo morgan
-const morgan = require('morgan');
-// Crea una instancia de la aplicación express
-const app = express();
+const express = require('express'); // Importa el módulo express
+const app = express(); // Crea una instancia de la aplicación express
+const morgan = require('morgan'); // Importa el módulo morgan
+const cors = require('cors') // Importa el paquete cors
+
 
 //! Configuración para leer datos JSON en el cuerpo de las solicitudes
 app.use(express.json());
+
+
+//! Middleware CORS
+// Permite solicitudes de cualquier origen.
+// Para mayor seguridad, podrías configurar esto para permitir solo orígenes específicos
+app.use(cors()) 
 
 
 //! Middleware para que Express muestre contenido estático

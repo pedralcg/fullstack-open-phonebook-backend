@@ -7,7 +7,7 @@
     "dev": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build:ui": "rm -rf dist && cp -r ../fullstack-open/part02/phonebook/dist .",
-    "deploy:full": "npm run build:ui && git add . && git commit -m \"ui build\" && git push"
+    "deploy:full": "npm run build:ui && git add . && git commit -m \"UI Build - $(date '+%Y-%m-%d %H:%M')\" && git push"
   },
   "repository": {
     "type": "git",
@@ -21,6 +21,7 @@
   "homepage": "https://github.com/pedralcg/fullstack-open-phonebook-backend#readme",
   "description": "",
   "dependencies": {
+    "cors": "^2.8.5",
     "express": "^5.1.0",
     "morgan": "^1.10.0"
   },
