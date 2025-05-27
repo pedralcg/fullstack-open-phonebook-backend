@@ -8,6 +8,10 @@ const app = express();
 //! Configuración para leer datos JSON en el cuerpo de las solicitudes
 app.use(express.json());
 
+
+//! Middleware para que Express muestre contenido estático
+app.use(express.static('dist'))
+
 //! Define un token personalizado para Morgan
 // Este token se llamará 'body' y su función devolverá el contenido de request.body
 // si la solicitud es un POST, de lo contrario, devolverá una cadena vacía.
