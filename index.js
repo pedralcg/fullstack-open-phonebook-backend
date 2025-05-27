@@ -1,10 +1,32 @@
 // Importa el módulo express
 const express = require('express');
+// Importa el módulo morgan
+const morgan = require('morgan');
 // Crea una instancia de la aplicación express
 const app = express();
 
-    //! Configuración para leer datos JSON en el cuerpo de las solicitudes
-    app.use(express.json());
+//! Configuración para leer datos JSON en el cuerpo de las solicitudes
+app.use(express.json());
+
+//! Define un token personalizado para Morgan
+// Este token se llamará 'body' y su función devolverá el contenido de request.body
+// si la solicitud es un POST, de lo contrario, devolverá una cadena vacía.
+morgan.token('body', function (req, res) {
+  // Solo queremos registrar el cuerpo para solicitudes POST
+  if (req.method === 'POST') {
+    return JSON.stringify(req.body);
+  }
+  return ''; // Devuelve una cadena vacía para otros métodos (GET, DELETE, etc.)
+});
+
+//! Middleware para el registro de solicitudes con morgan
+// Ahora usamos un formato personalizado que incluye nuestro nuevo token ':body'
+// El formato 'tiny' es ":method :url :status :res[content-length] - :response-time ms"
+// Le hemos añadido el ':body' al final.
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'));
+//// app.use(morgan('tiny'));
+
+//!  NUNCA debes registrar datos sensibles directamente en tus logs de producción (contraseñas, datos personales, etc.)
 
 // Datos codificados de la agenda telefónica
 let persons = [
