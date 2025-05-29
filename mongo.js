@@ -1,6 +1,8 @@
 //! Cargar variables de entorno
 require('dotenv').config() 
 
+//! Ojo! Añadir variable de entorno a Render cuando sea necesario: "Environment Variables"
+
 
 const mongoose = require('mongoose')
 

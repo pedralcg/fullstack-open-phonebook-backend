@@ -1,78 +1,50 @@
+//! Cargar variables de entorno
+require('dotenv').config()
+
 const express = require('express'); // Importa el módulo express
 const app = express(); // Crea una instancia de la aplicación express
 const morgan = require('morgan'); // Importa el módulo morgan
 const cors = require('cors') // Importa el paquete cors
 
+//* Importa el modelo Person desde el nuevo módulo
+const Person = require('./models/person')
 
-//! Configuración para leer datos JSON en el cuerpo de las solicitudes
-app.use(express.json());
+// Validar que la URL de MongoDB se ha cargado correctamente
+const url = process.env.MONGODB_URI
+if (!url) {
+  console.error('Error: MONGODB_URI not found in .env file or environment variables.');
+  console.error('Please make sure you have a .env file with MONGODB_URI=your_connection_string');
+  process.exit(1);
+}
+
+//* Middleware para parsear el cuerpo JSON
+app.use(express.json())
+app.use(express.static('dist')) // Si tienes un frontend estático en 'dist'
+app.use(cors()) // Habilita CORS si tu frontend está en un dominio diferente
 
 
-//! Middleware CORS
-// Permite solicitudes de cualquier origen.
-// Para mayor seguridad, podrías configurar esto para permitir solo orígenes específicos
-app.use(cors()) 
+// Custom token for morgan to log request body (useful for debugging)
+morgan.token('body', (req, res) => JSON.stringify(req.body));
+
+// Configura morgan para loguear requests, incluyendo el body para POST
+app.use(morgan(':method :status :res[content-length] - :response-time ms :body'))
 
 
-//! Middleware para que Express muestre contenido estático
-app.use(express.static('dist'))
-
-//! Define un token personalizado para Morgan
-// Este token se llamará 'body' y su función devolverá el contenido de request.body
-// si la solicitud es un POST, de lo contrario, devolverá una cadena vacía.
-morgan.token('body', function (req, res) {
-  // Solo queremos registrar el cuerpo para solicitudes POST
-  if (req.method === 'POST') {
-    return JSON.stringify(req.body);
-  }
-  return ''; // Devuelve una cadena vacía para otros métodos (GET, DELETE, etc.)
-});
-
-//! Middleware para el registro de solicitudes con morgan
-// Ahora usamos un formato personalizado que incluye nuestro nuevo token ':body'
-// El formato 'tiny' es ":method :url :status :res[content-length] - :response-time ms"
-// Le hemos añadido el ':body' al final.
-app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'));
-//// app.use(morgan('tiny'));
-
-//!  NUNCA debes registrar datos sensibles directamente en tus logs de producción (contraseñas, datos personales, etc.)
-
-// Datos codificados de la agenda telefónica
-let persons = [
-    {
-    "id": 1,
-    "name": "Arto Hellas",
-    "number": "040-123456"
-    },
-    {
-    "id": 2,
-    "name": "Ada Lovelace",
-    "number": "39-44-5323523"
-    },
-    {
-    "id": 3,
-    "name": "Dan Abramov",
-    "number": "12-43-234345"
-    },
-    {
-    "id": 4,
-    "name": "Mary Poppendieck",
-    "number": "39-23-6423122"
-    }
-];
 
 // Define una ruta para la raíz de la aplicación
 app.get('/', (request, response) => {
     response.send('<h1>Hello Phonebook Backend!</h1>');
 });
 
-// Define una ruta para obtener todas las entradas de la agenda telefónica
+//* Obtener todas las entradas de la agenda telefónica
 app.get('/api/persons', (request, response) => {
-    response.json(persons); // Envía los datos de 'persons' como JSON
-});
+  Person.find({}).then(persons => {
+    response.json(persons)
+  })
+})
 
 
-//! NUEVA RUTA: Obtener una entrada individual por ID
+//TODO: Obtener una entrada individual por ID
 app.get('/api/persons/:id', (request, response) => {
     // Accede al parámetro 'id' de la URL y conviértelo a número
     const id = Number(request.params.id);
@@ -91,7 +63,7 @@ app.get('/api/persons/:id', (request, response) => {
     });
 
 
-//! NUEVA RUTA: Eliminar una entrada por ID (DELETE)
+//TODO: Eliminar una entrada por ID (DELETE)
 app.delete('/api/persons/:id', (request, response) => {
     // Accede al parámetro 'id' de la URL y conviértelo a número
     const id = Number(request.params.id);
@@ -104,7 +76,7 @@ app.delete('/api/persons/:id', (request, response) => {
     });
 
 
-//! NUEVA RUTA: Añadir una nueva entrada (POST)
+//TODO: Añadir una nueva entrada (POST)
 app.post('/api/persons', (request, response) => {
   // Accede al cuerpo de la solicitud (ya parseado por express.json())
   const body = request.body;
@@ -154,7 +126,7 @@ app.post('/api/persons', (request, response) => {
 });
 
 
-//! NUEVA RUTA: /info
+//TODO: /info
 app.get('/info', (request, response) => {
   const numberOfEntries = persons.length; // Obtiene el número de entradas
   const requestTime = new Date(); // Obtiene la hora actual de la solicitud
@@ -168,7 +140,7 @@ app.get('/info', (request, response) => {
 });
 
 
-//! Define el puerto en el que la aplicación escuchará las peticiones
+//* Define el puerto en el que la aplicación escuchará las peticiones
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
