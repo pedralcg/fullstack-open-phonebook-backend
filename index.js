@@ -76,53 +76,50 @@ app.delete('/api/persons/:id', (request, response) => {
     });
 
 
-//TODO: Añadir una nueva entrada (POST)
+//* Añadir una nueva entrada (POST)
 app.post('/api/persons', (request, response) => {
   // Accede al cuerpo de la solicitud (ya parseado por express.json())
   const body = request.body;
 
   //* Validación 1: Comprobar si falta el nombre o el número
-  if (!body.name) {
+  if (!body.name || !body.number) {
     return response.status(400).json({
       error: 'Name missing'
     });
   }
   if (!body.number) {
     return response.status(400).json({
-      error: 'Number missing'
+      error: 'Number or number missing'
     });
   }
 
-  //* Validación 2: Comprobar si el nombre ya existe (insensible a mayúsculas/minúsculas)
-  const nameExists = persons.some(person =>
-    person.name.toLowerCase() === body.name.toLowerCase()
-  );
+  //! IGNORADO PARA EJERCICIO 3.14
+  // //* Validación 2: Comprobar si el nombre ya existe (insensible a mayúsculas/minúsculas)
+  // const nameExists = persons.some(person =>
+  //   person.name.toLowerCase() === body.name.toLowerCase()
+  // );
 
-  if (nameExists) {
-    return response.status(400).json({
-      error: 'Name must be unique'
-    });
-  }
+  // if (nameExists) {
+  //   return response.status(400).json({
+  //     error: 'Name must be unique'
+  //   });
+  // }
 
-  // Genera un nuevo ID aleatorio
-  const generateId = () => {
-    const min = 10;
-    const max = 1000000;
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-  };
 
-  // Crea el nuevo objeto persona
-  const person = {
-    id: generateId(), // Asigna el ID generado
+
+  // Crear instancia del modelo Person
+  const person = new Person({
     name: body.name,
     number: body.number
-  };
+  });
 
-  // Añade la nueva persona al array 'persons'
-  persons = persons.concat(person);
-
-  // Responde con la nueva persona creada y el código de estado 201 (Created)
-  response.status(201).json(person);
+  // Guardar la nueva persona en la base de datos
+  person.save()
+    .then(savedPerson => {
+      // Enviar la respuesta con la persona recién guardada
+      response.status(201).json(savedPerson); // 201 Created para una creación exitosa
+    })
+    .catch(error => next(error)); // Pasa cualquier error de guardado al middleware de errores
 });
 
 
