@@ -80,6 +80,37 @@ app.delete('/api/persons/:id', (request, response, next) => {
     .catch(error => next(error)); // Pasa el error al middleware de errores
 });
 
+
+//* Actualizar una entrada existente (PUT)
+app.put('/api/persons/:id', (request, response, next) => {
+  const id = request.params.id;
+  const body = request.body;
+
+  // Creamos un objeto con los campos que queremos actualizar
+  const person = {
+    name: body.name,
+    number: body.number,
+  };
+
+  // findByIdAndUpdate(id, datos_a_actualizar, opciones)
+  // { new: true }: Asegura que la promesa devuelva el documento *actualizado*
+  // { runValidators: true }: Ejecuta las validaciones del esquema (ej. minlength, required)
+  // { context: 'query' }: Necesario en algunos casos para que runValidators funcione con 'unique'
+  Person.findByIdAndUpdate(id, person, { new: true, runValidators: true, context: 'query' })
+    .then(updatedPerson => {
+      // Si updatedPerson es null, significa que no se encontró ninguna persona con ese ID
+      if (updatedPerson) {
+        // Envía la persona actualizada como respuesta
+        response.json(updatedPerson);
+      } else {
+        // Si no se encontró, envía un 404 Not Found
+        response.status(404).end();
+      }
+    })
+    .catch(error => next(error)); // Pasa cualquier error al middleware de errores
+});
+
+
 //* Añadir una nueva entrada (POST)
 app.post('/api/persons', (request, response, post) => {
   // Accede al cuerpo de la solicitud (ya parseado por express.json())
@@ -96,18 +127,6 @@ app.post('/api/persons', (request, response, post) => {
       error: 'Number or number missing'
     });
   }
-
-  //! IGNORADO PARA EJERCICIO 3.14
-  // //* Validación 2: Comprobar si el nombre ya existe (insensible a mayúsculas/minúsculas)
-  // const nameExists = persons.some(person =>
-  //   person.name.toLowerCase() === body.name.toLowerCase()
-  // );
-
-  // if (nameExists) {
-  //   return response.status(400).json({
-  //     error: 'Name must be unique'
-  //   });
-  // }
 
   // Crear instancia del modelo Person
   const person = new Person({
