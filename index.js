@@ -63,18 +63,21 @@ app.get('/api/persons/:id', (request, response) => {
     });
 
 
-//TODO: Eliminar una entrada por ID (DELETE)
+// Eliminar una entrada por ID (DELETE)
 app.delete('/api/persons/:id', (request, response) => {
     // Accede al parámetro 'id' de la URL y conviértelo a número
-    const id = Number(request.params.id);
+    const id = request.params.id;
 
-    // Filtra el array 'persons' para crear un nuevo array sin la persona con el ID dado.
-    persons = persons.filter(person => person.id !== id);
-
-    // El código 204 indica que la solicitud fue exitosa pero no hay contenido que devolver.
-    response.status(204).end();
+    Person.findByIdAndDelete(id)
+    // 'result' es el documento eliminado, o null si no se encontró
+    .then(result => {
+      // 204 No Content para eliminación exitosa (o si no se encontró)
+      response.status(204).end();
+    })
+    .catch(error => {
+      console.error(error.message); // Loguea el mensaje de error para depuración
     });
-
+});
 
 //* Añadir una nueva entrada (POST)
 app.post('/api/persons', (request, response) => {
