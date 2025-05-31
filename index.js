@@ -47,23 +47,24 @@ app.get('/api/persons', (request, response, next) => {
 
 
 
-//TODO: Obtener una entrada individual por ID
-app.get('/api/persons/:id', (request, response) => {
+//* Obtener una entrada individual por ID
+app.get('/api/persons/:id', (request, response, next) => {
     // Accede al parámetro 'id' de la URL y conviértelo a número
-    const id = Number(request.params.id);
+    const id = request.params.id;
 
-    // Busca la persona con el id correspondiente en el array 'persons'
-    const person = persons.find(p => p.id === id);
-
-    // Comprueba si se encontró la persona
-    if (person) {
-        response.json(person); // Si se encuentra, envía los datos como JSON
-    } else {
-        // Si no se encuentra, envía un código de estado 404 (Not Found)
-        // y termina la respuesta sin cuerpo (end()).
-        response.status(404).end();
-    }
-    });
+    // Usa findById para buscar en la base de datos
+    Person.findById(id)
+      .then(person => {
+        if (person) {
+          response.json(person); // Si se encuentra, envía los datos como JSON
+        } else {
+          // Si no se encuentra, envía un código de estado 404 (Not Found)
+          response.status(404).end();
+        }
+      })
+      // Pasa cualquier error (incluido CastError) al middleware de errores
+      .catch(error => next(error));
+})
 
 
 //* Eliminar una entrada por ID (DELETE)
@@ -144,17 +145,21 @@ app.post('/api/persons', (request, response, post) => {
 });
 
 
-//TODO: /info
-app.get('/info', (request, response) => {
-  const numberOfEntries = persons.length; // Obtiene el número de entradas
-  const requestTime = new Date(); // Obtiene la hora actual de la solicitud
+//* Ruta /info
+app.get('/info', (request, response, next) => {
+  // Obtiene la hora actual de la solicitud
+  const requestTime = new Date();
 
-  // Construye la respuesta HTML
-    const infoHtml = `
-        <p>Phonebook has info for ${numberOfEntries} people</p>
+  // Usa countDocuments para obtener el número real de entradas de la base de datos
+  Person.countDocuments({})
+    .then(count => {
+      const infoHtml = `
+        <p>Phonebook has info for ${count} people</p>
         <p>${requestTime}</p>
-    `;
-  response.send(infoHtml); // Envía la respuesta HTML
+      `;
+      response.send(infoHtml);
+    })
+    .catch(error => next(error)); // Pasa cualquier error de base de datos al middleware de errores
 });
 
 // Middleware unknownEndpoint
