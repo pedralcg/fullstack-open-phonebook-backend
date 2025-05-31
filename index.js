@@ -37,11 +37,14 @@ app.get('/', (request, response) => {
 });
 
 //* Obtener todas las entradas de la agenda telefónica
-app.get('/api/persons', (request, response) => {
+app.get('/api/persons', (request, response, next) => {
   Person.find({}).then(persons => {
     response.json(persons)
   })
+  // Pasa cualquier error (ej. conexión DB) al middleware de errores
+  .catch(error => next(error));
 })
+
 
 
 //TODO: Obtener una entrada individual por ID
@@ -63,8 +66,8 @@ app.get('/api/persons/:id', (request, response) => {
     });
 
 
-// Eliminar una entrada por ID (DELETE)
-app.delete('/api/persons/:id', (request, response) => {
+//* Eliminar una entrada por ID (DELETE)
+app.delete('/api/persons/:id', (request, response, next) => {
     // Accede al parámetro 'id' de la URL y conviértelo a número
     const id = request.params.id;
 
@@ -74,13 +77,11 @@ app.delete('/api/persons/:id', (request, response) => {
       // 204 No Content para eliminación exitosa (o si no se encontró)
       response.status(204).end();
     })
-    .catch(error => {
-      console.error(error.message); // Loguea el mensaje de error para depuración
-    });
+    .catch(error => next(error)); // Pasa el error al middleware de errores
 });
 
 //* Añadir una nueva entrada (POST)
-app.post('/api/persons', (request, response) => {
+app.post('/api/persons', (request, response, post) => {
   // Accede al cuerpo de la solicitud (ya parseado por express.json())
   const body = request.body;
 
@@ -107,8 +108,6 @@ app.post('/api/persons', (request, response) => {
   //     error: 'Name must be unique'
   //   });
   // }
-
-
 
   // Crear instancia del modelo Person
   const person = new Person({
@@ -138,6 +137,29 @@ app.get('/info', (request, response) => {
     `;
   response.send(infoHtml); // Envía la respuesta HTML
 });
+
+// Middleware unknownEndpoint
+const unknownEndpoint = (request, response) => {
+  response.status(404).send({ error: 'unknown endpoint' })
+}
+app.use(unknownEndpoint)
+
+
+//! Middleware de manejo de errores
+const errorHandler = (error, request, response, next) => {
+  // Loguea el mensaje de error para depuración en la consola del servidor
+  console.error(error.message);
+
+  if (error.name === 'CastError') {
+    // Si el error es un CastError (ID malformado)
+    return response.status(400).send({ error: 'malformatted id' });
+  }
+
+  next(error);
+};
+
+// ¡Este debe ser el último middleware cargado!
+app.use(errorHandler);
 
 
 //* Define el puerto en el que la aplicación escuchará las peticiones
