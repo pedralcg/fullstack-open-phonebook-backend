@@ -8,7 +8,8 @@ console.log('Connecting to MongoDB')
 // console.log('connecting to', url)
 
 mongoose.connect(url)
-  .then(result => {
+  //! error  'result' is defined but never used  no-unused-vars
+  .then(() => {
     console.log('Connected to MongoDB')
   })
   .catch(error => {
@@ -34,7 +35,7 @@ const personSchema = new mongoose.Schema({
         // ^\d{2,3}  -> Inicia con 2 o 3 dígitos
         // -         -> Seguido de un guion
         // \d+$      -> Seguido de uno o más dígitos hasta el final de la cadena
-        return /^\d{2,3}-\d+$/.test(v);
+        return /^\d{2,3}-\d+$/.test(v)
       },
       message: props => `${props.value} is not a valid phone number!. 
                         A phone number must have 2 or 3 numbers in the first part,

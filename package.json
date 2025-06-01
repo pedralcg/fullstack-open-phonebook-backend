@@ -7,7 +7,8 @@
     "dev": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build:ui": "rm -rf dist && cp -r ../fullstack-open/part02/phonebook/dist .",
-    "deploy:full": "npm run build:ui && git add . && git commit -m \"UI Build - $(date '+%Y-%m-%d %H:%M')\" && git push"
+    "deploy:full": "npm run build:ui && git add . && git commit -m \"UI Build - $(date '+%Y-%m-%d %H:%M')\" && git push",
+    "lint": "eslint ."
   },
   "repository": {
     "type": "git",
@@ -28,6 +29,10 @@
     "morgan": "^1.10.0"
   },
   "devDependencies": {
+    "@eslint/js": "^9.28.0",
+    "@stylistic/eslint-plugin-js": "^4.4.0",
+    "eslint": "^9.28.0",
+    "globals": "^16.2.0",
     "nodemon": "^3.1.10"
   }
 }

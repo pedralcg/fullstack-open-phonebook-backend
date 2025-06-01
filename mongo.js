@@ -1,5 +1,5 @@
 //! Cargar variables de entorno
-require('dotenv').config() 
+require('dotenv').config()
 
 //! Ojo! Añadir variable de entorno a Render cuando sea necesario: "Environment Variables"
 
@@ -29,9 +29,9 @@ const url = process.env.MONGODB_URI
 
 // Validar que la URL de MongoDB se ha cargado correctamente
 if (!url) {
-  console.error('Error: MONGODB_URI not found in .env file or environment variables.');
-  console.error('Please make sure you have a .env file with MONGODB_URI=your_connection_string');
-  process.exit(1);
+  console.error('Error: MONGODB_URI not found in .env file or environment variables.')
+  console.error('Please make sure you have a .env file with MONGODB_URI=your_connection_string')
+  process.exit(1)
 }
 
 // 4. Configurar Mongoose (strictQuery) y conectar
@@ -57,10 +57,10 @@ if (process.argv.length === 4) {
   const name = process.argv[2]
   const number = process.argv[3]
 
-// //! Método ejercicio 3.12
-// if (process.argv.length === 5) {
-// const name = process.argv[3]
-// const number = process.argv[4]
+  // //! Método ejercicio 3.12
+  // if (process.argv.length === 5) {
+  // const name = process.argv[3]
+  // const number = process.argv[4]
 
   const person = new Person({
     name: name,
@@ -68,7 +68,8 @@ if (process.argv.length === 4) {
   })
 
   person.save()
-    .then(result => {
+    //! error  'result' is defined but never used  no-unused-vars
+    .then(() => {
       console.log(`added ${name} number ${number} to phonebook`)
       mongoose.connection.close() // Cierra la conexión después de guardar
     })
