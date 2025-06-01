@@ -30,11 +30,11 @@ morgan.token('body', (req, res) => JSON.stringify(req.body));
 app.use(morgan(':method :status :res[content-length] - :response-time ms :body'))
 
 
-
-// Define una ruta para la raíz de la aplicación
+//* Define una ruta para la raíz de la aplicación
 app.get('/', (request, response) => {
     response.send('<h1>Hello Phonebook Backend!</h1>');
 });
+
 
 //* Obtener todas las entradas de la agenda telefónica
 app.get('/api/persons', (request, response, next) => {
@@ -44,7 +44,6 @@ app.get('/api/persons', (request, response, next) => {
   // Pasa cualquier error (ej. conexión DB) al middleware de errores
   .catch(error => next(error));
 })
-
 
 
 //* Obtener una entrada individual por ID
@@ -113,7 +112,7 @@ app.put('/api/persons/:id', (request, response, next) => {
 
 
 //* Añadir una nueva entrada (POST)
-app.post('/api/persons', (request, response, post) => {
+app.post('/api/persons', (request, response, next) => {
   // Accede al cuerpo de la solicitud (ya parseado por express.json())
   const body = request.body;
 
@@ -175,8 +174,11 @@ const errorHandler = (error, request, response, next) => {
   console.error(error.message);
 
   if (error.name === 'CastError') {
-    // Si el error es un CastError (ID malformado)
+    // Si el error es un CastError (ID malformado)
     return response.status(400).send({ error: 'malformatted id' });
+  } else if (error.name === 'ValidationError') {
+    // Si el error es un ValidationError (por ejemplo, minLength, required, unique)
+    return response.status(400).json({ error: error.message });
   }
 
   next(error);
